@@ -1,12 +1,9 @@
--- ============================================================
--- FOOTBALL STATS - DATABASE MYSQL
--- Schema relazionale normalizzato (3NF)
--- ============================================================
+
 
 CREATE DATABASE IF NOT EXISTS football_stats CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE football_stats;
 
--- ─── UTENTI ──────────────────────────────────────────────────
+
 CREATE TABLE IF NOT EXISTS utenti (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   nome            VARCHAR(100) NOT NULL,
@@ -16,7 +13,7 @@ CREATE TABLE IF NOT EXISTS utenti (
   creato_il       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ─── SQUADRE ─────────────────────────────────────────────────
+
 CREATE TABLE IF NOT EXISTS squadre (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   nome            VARCHAR(100) NOT NULL,
@@ -28,7 +25,7 @@ CREATE TABLE IF NOT EXISTS squadre (
   colore_secondario VARCHAR(7)
 );
 
--- ─── GIOCATORI ───────────────────────────────────────────────
+
 CREATE TABLE IF NOT EXISTS giocatori (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   nome            VARCHAR(100) NOT NULL,
@@ -42,7 +39,7 @@ CREATE TABLE IF NOT EXISTS giocatori (
   FOREIGN KEY (squadra_id) REFERENCES squadre(id) ON DELETE CASCADE
 );
 
--- ─── PARTITE ─────────────────────────────────────────────────
+
 CREATE TABLE IF NOT EXISTS partite (
   id                  INT AUTO_INCREMENT PRIMARY KEY,
   squadra_casa_id     INT NOT NULL,
@@ -60,7 +57,7 @@ CREATE TABLE IF NOT EXISTS partite (
   CHECK (squadra_casa_id <> squadra_ospite_id)
 );
 
--- ─── STATISTICHE GIOCATORE (aggregato per stagione) ──────────
+
 CREATE TABLE IF NOT EXISTS statistiche_giocatore (
   id                  INT AUTO_INCREMENT PRIMARY KEY,
   giocatore_id        INT NOT NULL,
@@ -80,7 +77,7 @@ CREATE TABLE IF NOT EXISTS statistiche_giocatore (
   FOREIGN KEY (giocatore_id) REFERENCES giocatori(id) ON DELETE CASCADE
 );
 
--- ─── PRESTAZIONI PER PARTITA ─────────────────────────────────
+
 CREATE TABLE IF NOT EXISTS prestazioni_partita (
   id              INT AUTO_INCREMENT PRIMARY KEY,
   giocatore_id    INT NOT NULL,
@@ -97,7 +94,7 @@ CREATE TABLE IF NOT EXISTS prestazioni_partita (
   FOREIGN KEY (partita_id) REFERENCES partite(id) ON DELETE CASCADE
 );
 
--- ─── CLASSIFICA STAGIONALE ────────────────────────────────────
+
 CREATE TABLE IF NOT EXISTS classifica_stagionale (
   id                INT AUTO_INCREMENT PRIMARY KEY,
   squadra_id        INT NOT NULL,
@@ -113,7 +110,7 @@ CREATE TABLE IF NOT EXISTS classifica_stagionale (
   FOREIGN KEY (squadra_id) REFERENCES squadre(id) ON DELETE CASCADE
 );
 
--- ─── DATI DI ESEMPIO ─────────────────────────────────────────
+
 
 INSERT INTO squadre (nome, citta, stadio, anno_fondazione, colore_primario, colore_secondario) VALUES
 ('FC Juventus',       'Torino',  'Allianz Stadium',    1897, '#000000', '#FFFFFF'),
@@ -171,7 +168,7 @@ INSERT INTO prestazioni_partita (giocatore_id, partita_id, minuti_giocati, gol, 
 (2, 1, 90, 1, 2, 2, 8.0),
 (2, 2, 90, 0, 1, 1, 7.0);
 
--- ─── VIEW UTILI ───────────────────────────────────────────────
+
 CREATE OR REPLACE VIEW v_classifica AS
 SELECT 
   ROW_NUMBER() OVER (ORDER BY cs.punti DESC, (cs.gol_fatti - cs.gol_subiti) DESC) AS posizione,

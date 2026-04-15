@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
 
-// ─── MOCK API (sostituire con chiamate reali al backend) ──────
 const API_BASE = "http://localhost:3001/api";
 
 const mockToken = "mock_jwt_token";
@@ -39,14 +38,11 @@ const mockData = {
   ],
 };
 
-// ─── COLORI SQUADRA ───────────────────────────────────────────
 const squadraColori = {
   "FC Juventus": "#1a1a2e", "Inter Milan": "#003399",
   "SSC Napoli": "#009fe3",  "AC Milan": "#cc0000",
   "Atalanta BC": "#1e3a8a", "AS Roma": "#cc0000",
 };
-
-// ─── COMPONENTI ───────────────────────────────────────────────
 
 function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
@@ -158,7 +154,6 @@ function LoginPage({ onLogin }) {
   );
 }
 
-// ─── BARRA LATERALE ───────────────────────────────────────────
 function Sidebar({ sezioneAttiva, setSezione, onLogout, user }) {
   const voci = [
     { id: "dashboard", label: "Dashboard", icona: "📊" },
@@ -221,7 +216,6 @@ function Sidebar({ sezioneAttiva, setSezione, onLogout, user }) {
   );
 }
 
-// ─── SEZIONE DASHBOARD ────────────────────────────────────────
 function DashboardHome({ data }) {
   const cards = [
     { label: "Squadre in classifica", valore: data.classifica.length, icona: "🏟️", colore: "#58a6ff" },
@@ -271,7 +265,6 @@ function DashboardHome({ data }) {
   );
 }
 
-// ─── SEZIONE CLASSIFICA ───────────────────────────────────────
 function Classifica({ classifica }) {
   return (
     <div>
@@ -328,7 +321,6 @@ function Classifica({ classifica }) {
   );
 }
 
-// ─── SEZIONE STATISTICHE GIOCATORE ───────────────────────────
 function StatisticheGiocatore({ dati }) {
   const { giocatore, statistiche, kpi, prestazioni_recenti } = dati;
   const statItems = [
@@ -421,7 +413,6 @@ function StatisticheGiocatore({ dati }) {
   );
 }
 
-// ─── SEZIONE PARTITE ─────────────────────────────────────────
 function Partite({ prossime }) {
   return (
     <div>
@@ -460,7 +451,6 @@ function Partite({ prossime }) {
   );
 }
 
-// ─── SEZIONE PREVISIONI ───────────────────────────────────────
 function Previsioni({ classifica, previsione: prevIniziale }) {
   const [casaId, setCasaId] = useState(0);
   const [ospiteId, setOspiteId] = useState(1);
@@ -575,7 +565,7 @@ function Previsioni({ classifica, previsione: prevIniziale }) {
   );
 }
 
-// ─── TOP GIOCATORI ────────────────────────────────────────────
+
 function TopGiocatori({ giocatori }) {
   return (
     <div>
@@ -617,7 +607,7 @@ function TopGiocatori({ giocatori }) {
   );
 }
 
-// ─── APP PRINCIPALE ───────────────────────────────────────────
+
 export default function App() {
   const [auth, setAuth] = useState(null);
   const [sezione, setSezione] = useState("dashboard");

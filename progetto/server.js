@@ -1,3 +1,4 @@
+
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
@@ -10,7 +11,7 @@ app.use(express.json());
 
 const JWT_SECRET = 'football_stats_secret_2024';
 
-// ─── DB CONNECTION POOL ───────────────────────────────────────────────────────
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
@@ -20,7 +21,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
-// ─── AUTH MIDDLEWARE ──────────────────────────────────────────────────────────
+
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Token mancante' });
@@ -32,10 +33,9 @@ function authMiddleware(req, res, next) {
   }
 }
 
-// ─── AUTH ENDPOINTS ───────────────────────────────────────────────────────────
 
-// POST /api/auth/register
-app.post('/api/auth/register', async (req, res) => {
+
+ app.post('/api/auth/register', async (req, res) => {
   try {
     const { nome, email, password, ruolo } = req.body;
     if (!nome || !email || !password) return res.status(400).json({ error: 'Campi obbligatori mancanti' });
@@ -52,7 +52,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// POST /api/auth/login
+
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -68,9 +68,12 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// ─── SQUADRE ─────────────────────────────────────────────────────────────────
 
-// GET /api/squadre
+
+
+
+
+
 app.get('/api/squadre', authMiddleware, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM squadre ORDER BY nome');
@@ -80,7 +83,7 @@ app.get('/api/squadre', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/squadre/:id
+
 app.get('/api/squadre/:id', authMiddleware, async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM squadre WHERE id = ?', [req.params.id]);
@@ -91,9 +94,12 @@ app.get('/api/squadre/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── CLASSIFICA ───────────────────────────────────────────────────────────────
 
-// GET /api/classifica
+
+
+
+
+
 app.get('/api/classifica', authMiddleware, async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -113,9 +119,12 @@ app.get('/api/classifica', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── GIOCATORI ────────────────────────────────────────────────────────────────
 
-// GET /api/giocatori
+
+
+
+
+
 app.get('/api/giocatori', authMiddleware, async (req, res) => {
   try {
     const { squadra_id } = req.query;
@@ -130,7 +139,7 @@ app.get('/api/giocatori', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/giocatori/:id/statistiche
+
 app.get('/api/giocatori/:id/statistiche', authMiddleware, async (req, res) => {
   try {
     const id = req.params.id;
@@ -155,7 +164,7 @@ app.get('/api/giocatori/:id/statistiche', authMiddleware, async (req, res) => {
       ORDER BY p.data_partita DESC LIMIT 5
     `, [id]);
 
-    // Calcolo KPI del giocatore
+    
     const kpi = calcolaKPI(stats[0] || {});
 
     res.json({
@@ -169,9 +178,12 @@ app.get('/api/giocatori/:id/statistiche', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── PARTITE ─────────────────────────────────────────────────────────────────
 
-// GET /api/partite
+
+
+
+
+
 app.get('/api/partite', authMiddleware, async (req, res) => {
   try {
     const { stato, squadra_id } = req.query;
@@ -195,7 +207,7 @@ app.get('/api/partite', authMiddleware, async (req, res) => {
   }
 });
 
-// GET /api/partite/prossime
+
 app.get('/api/partite/prossime', authMiddleware, async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -214,15 +226,17 @@ app.get('/api/partite/prossime', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── ALGORITMO DI ANALISI: PREVISIONE PARTITA ────────────────────────────────
-// Usa Elo rating + forma recente + vantaggio casa
 
-// GET /api/analisi/previsione/:squadra_casa_id/:squadra_ospite_id
+
+
+
+
+
 app.get('/api/analisi/previsione/:squadra_casa_id/:squadra_ospite_id', authMiddleware, async (req, res) => {
   try {
     const { squadra_casa_id, squadra_ospite_id } = req.params;
 
-    // Recupera statistiche stagionali delle due squadre
+    
     const [casa] = await pool.query(
       'SELECT * FROM classifica_stagionale WHERE squadra_id = ? ORDER BY stagione DESC LIMIT 1',
       [squadra_casa_id]
@@ -236,7 +250,7 @@ app.get('/api/analisi/previsione/:squadra_casa_id/:squadra_ospite_id', authMiddl
       return res.status(404).json({ error: 'Dati insufficienti per la previsione' });
     }
 
-    // Recupera ultimi 5 risultati per calcolare la forma
+    
     const [formaCasa] = await pool.query(`
       SELECT gol_casa, gol_ospite, squadra_casa_id, squadra_ospite_id FROM partite
       WHERE (squadra_casa_id = ? OR squadra_ospite_id = ?) AND stato = 'completata'
@@ -257,7 +271,7 @@ app.get('/api/analisi/previsione/:squadra_casa_id/:squadra_ospite_id', authMiddl
   }
 });
 
-// GET /api/analisi/top-giocatori
+
 app.get('/api/analisi/top-giocatori', authMiddleware, async (req, res) => {
   try {
     const [rows] = await pool.query(`
@@ -281,25 +295,17 @@ app.get('/api/analisi/top-giocatori', authMiddleware, async (req, res) => {
   }
 });
 
-// ─── ALGORITMI DI ANALISI ────────────────────────────────────────────────────
 
-/**
- * Algoritmo di previsione partita basato su:
- * 1. Win-rate storico (40%)
- * 2. Differenza reti (30%)
- * 3. Forma recente ultimi 5 match (30%)
- * Output: probabilità vittoria_casa, pareggio, vittoria_ospite
- */
 function calcolaPrevisionePartita(casa, ospite, formaCasa, casaId, formaOspite, ospiteId) {
-  // 1. Win rate
+ 
   const winRateCasa = casa.partite_giocate > 0 ? (casa.vittorie + 0.5 * casa.pareggi) / casa.partite_giocate : 0.33;
   const winRateOspite = ospite.partite_giocate > 0 ? (ospite.vittorie + 0.5 * ospite.pareggi) / ospite.partite_giocate : 0.33;
 
-  // 2. Differenza reti per partita
+
   const drCasa = casa.partite_giocate > 0 ? (casa.gol_fatti - casa.gol_subiti) / casa.partite_giocate : 0;
   const drOspite = ospite.partite_giocate > 0 ? (ospite.gol_fatti - ospite.gol_subiti) / ospite.partite_giocate : 0;
 
-  // 3. Forma recente: 3pt vittoria, 1pt pareggio, 0pt sconfitta
+
   const calcolaForma = (partite, squadraId) => {
     if (!partite.length) return 0.5;
     let punti = 0;
@@ -316,7 +322,7 @@ function calcolaPrevisionePartita(casa, ospite, formaCasa, casaId, formaOspite, 
   const formaCasaNorm = calcolaForma(formaCasa, casaId);
   const formaOspiteNorm = calcolaForma(formaOspite, ospiteId);
 
-  // Punteggio composito (vantaggio casa +5%)
+  /
   const HOME_ADVANTAGE = 0.05;
   const scoreCasa = (winRateCasa * 0.4 + normalizzaDR(drCasa) * 0.3 + formaCasaNorm * 0.3) + HOME_ADVANTAGE;
   const scoreOspite = winRateOspite * 0.4 + normalizzaDR(drOspite) * 0.3 + formaOspiteNorm * 0.3;
@@ -325,13 +331,13 @@ function calcolaPrevisionePartita(casa, ospite, formaCasa, casaId, formaOspite, 
   const rawCasa = scoreCasa / totale;
   const rawOspite = scoreOspite / totale;
 
-  // Probabilità pareggio basata su quanto sono vicine le squadre
+  
   const vicinanza = 1 - Math.abs(rawCasa - rawOspite);
   const probPareggio = Math.max(0.1, Math.min(0.35, vicinanza * 0.35));
   const probCasa = rawCasa * (1 - probPareggio);
   const probOspite = rawOspite * (1 - probPareggio);
 
-  // Normalizza a 100%
+  
   const somma = probCasa + probPareggio + probOspite;
 
   return {
@@ -348,13 +354,11 @@ function calcolaPrevisionePartita(casa, ospite, formaCasa, casaId, formaOspite, 
 }
 
 function normalizzaDR(dr) {
-  // Normalizza differenza reti [-5, +5] → [0, 1]
+  
   return Math.max(0, Math.min(1, (dr + 5) / 10));
 }
 
-/**
- * Calcola KPI giocatore: rating globale su scala 0-10
- */
+
 function calcolaKPI(stats) {
   if (!stats || !stats.minuti_giocati) return { rating: 0, livello: 'N/D' };
   const partite = Math.max(1, stats.minuti_giocati / 90);
@@ -366,6 +370,6 @@ function calcolaKPI(stats) {
   return { rating: Math.round(rating * 10) / 10, livello };
 }
 
-// ─── START SERVER ─────────────────────────────────────────────────────────────
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`✅ Server avviato su porta ${PORT}`));
