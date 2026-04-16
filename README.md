@@ -1,5 +1,3 @@
-# football-analitica-barbarossa-conti-tommaso
-@ -1,103 +0,0 @@
 # ⚽ Football Stats Dashboard
 
 Piattaforma di sport-analytics per la visualizzazione di dati calcistici, statistiche giocatori, classifica e previsioni partite.
